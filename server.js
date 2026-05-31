@@ -8,6 +8,11 @@ const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname + "/index.html"));
+});
+
 app.use(express.static(__dirname));
 
 const transporter = nodemailer.createTransport({
