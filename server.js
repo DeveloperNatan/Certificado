@@ -6,14 +6,32 @@ const path = require("path");
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 const app = express();
+
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname + "/index.html"));
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src-elem 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; base-uri 'self'; form-action 'self'; object-src 'none';",
+  );
+  next();
 });
 
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "favicon.ico"));
+});
+
+app.get("/logo.png", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "logo.png"));
+});
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -32,10 +50,8 @@ async function gerarPdf(nome) {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPages()[0];
   const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const { width } = page.getSize();
 
   const fontSize = 18;
-  const textWidth = font.widthOfTextAtSize(nome, fontSize);
   const x = 285;
   const y = 365;
 
@@ -58,8 +74,13 @@ app.post("/enviar", async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Seu certificado "Meu primeiro código" chegou🎉',
-      html: `<p>Olá ${nome},\n\nSegue em anexo o seu certificado.\n\nParabéns pela conclusão e obrigado pela participação!\n\nAtenciosamente,\nTurma A - Engenharia de Sofwatre </p>`,
+      subject: 'Seu certificado "Meu primeiro código" chegou 🎉',
+      html: `
+        <p>Olá ${nome},</p>
+        <p>Segue em anexo o seu certificado.</p>
+        <p>Parabéns pela conclusão e obrigado pela participação!</p>
+        <p>Atenciosamente,<br>Turma A - Engenharia de Sofwatre</p>
+      `,
       attachments: [
         {
           filename: "certificado.pdf",
@@ -75,4 +96,4 @@ app.post("/enviar", async (req, res) => {
   }
 });
 
-app.listen(3000);
+app.listen(3000, () => console.log("Rodando na porta 3000"));
