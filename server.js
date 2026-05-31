@@ -44,7 +44,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function gerarPdf(nome) {
-  const pdfPath = path.join(__dirname, "certificado.pdf");
+  const pdfPath = path.join(__dirname, "public", "certificado.pdf");
   const pdfBytes = fs.readFileSync(pdfPath);
 
   const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -96,4 +96,4 @@ app.post("/enviar", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Rodando na porta 3000"));
+app.listen(3000);
