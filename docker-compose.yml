@@ -1,0 +1,13 @@
+services:
+  certificado:
+    image: natanrocco/certificado-pac:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: suspicious_ramanujan
+    ports:
+      - "8080:8080"
+    environment:
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      PORT: ${PORT}
