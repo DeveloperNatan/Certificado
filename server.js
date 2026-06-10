@@ -4,6 +4,9 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
+const PORT = process.env.PORT;
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 
 const app = express();
 
@@ -96,4 +99,8 @@ app.post("/enviar", async (req, res) => {
   }
 });
 
-app.listen(3000);
+app.listen(PORT, () => {
+  console.log(
+    `Servidor rodando na porta: ${PORT} senha: ${EMAIL_PASS} email: ${EMAIL_USER}`,
+  );
+});
